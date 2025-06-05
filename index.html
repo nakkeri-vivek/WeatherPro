@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherPro</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" type="image/png" href="https://openweathermap.org/img/wn/02d@2x.png">
+    <!-- Space Grotesk Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-sun"></i>
+                <h1>WeatherPro</h1>
+            </div>
+            <p class="tagline">Real-time Weather Insights</p>
+        </header>
+
+        <p class="search-label">Get accurate weather forecasts for any city worldwide</p>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="city-input" placeholder="Search for a city...">
+                <button id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="unit-toggle">
+                <button class="unit-btn active" data-unit="celsius">°C</button>
+                <button class="unit-btn" data-unit="fahrenheit">°F</button>
+            </div>
+        </div>
+
+        <!-- Location selector modal -->
+        <div id="location-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Multiple locations found</h3>
+                <p>Please select the correct location:</p>
+                <div id="location-list" class="location-list">
+                    <!-- Location options will be added here -->
+                </div>
+                <button id="modal-close" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Coordinates search modal -->
+        <div id="coordinates-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Location Not Found</h3>
+                <p class="coord-message">The location you searched for isn't in our database. You can try searching with coordinates instead.</p>
+                
+                <div class="coordinates-form">
+                    <div class="coord-input">
+                        <label for="latitude">Latitude</label>
+                        <input type="number" id="latitude" step="0.000001" placeholder="e.g., 15.8281">
+                    </div>
+                    <div class="coord-input">
+                        <label for="longitude">Longitude</label>
+                        <input type="number" id="longitude" step="0.000001" placeholder="e.g., 78.0373">
+                    </div>
+                    <button id="search-coords" class="search-coords-btn">
+                        <i class="fas fa-search"></i> Get Weather
+                    </button>
+                </div>
+
+                <div class="coord-help">
+                    <p><i class="fas fa-info-circle"></i> Tip: You can find coordinates by:</p>
+                    <ul>
+                        <li>Right-clicking a location on Google Maps</li>
+                        <li>Using your device's GPS</li>
+                        <li>Searching "[city name] coordinates" on Google</li>
+                    </ul>
+                </div>
+
+                <button id="coords-modal-close" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="favorites-section">
+            <div class="favorites-header">
+                <i class="far fa-heart"></i>
+                <h3>Favorite Cities</h3>
+            </div>
+            <div id="favorites-list" class="favorites-list">
+                <p class="no-favorites">No Favorite Cities Yet</p>
+                <p class="favorites-hint">Search for a city and add it to your favorites for quick access</p>
+            </div>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Fetching weather data...</p>
+        </div>
+
+        <div id="error-message" class="error hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <p></p>
+        </div>
+
+        <div id="weather-info" class="weather-info hidden">
+            <div class="weather-top">
+                <div class="weather-header">
+                    <div class="city-info">
+                        <h2 id="city-name"></h2>
+                        <p class="country" id="country"></p>
+                        <p class="date" id="current-date"></p>
+                        <p class="weather-desc" id="description"></p>
+                    </div>
+                </div>
+
+                <div class="main-temp">
+                    <span id="temperature"></span>
+                    <span class="unit">°C</span>
+                    <img id="weather-icon" src="" alt="Weather icon">
+                    <p class="clear-sky" id="sky-status"></p>
+                    <button id="favorite-btn" class="favorite-btn">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="weather-details-grid">
+                <div class="detail-card">
+                    <i class="fas fa-thermometer-half"></i>
+                    <p>Feels like</p>
+                    <span id="feels-like"></span>
+                </div>
+                <div class="detail-card">
+                    <i class="fas fa-tint"></i>
+                    <p>Humidity</p>
+                    <span id="humidity"></span>
+                </div>
+                <div class="detail-card">
+                    <i class="fas fa-wind"></i>
+                    <p>Wind Speed</p>
+                    <span id="wind-speed"></span>
+                </div>
+                <div class="detail-card">
+                    <i class="fas fa-eye"></i>
+                    <p>Visibility</p>
+                    <span id="visibility"></span>
+                </div>
+            </div>
+
+            <div class="additional-details">
+                <h3>Additional Details</h3>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-compress-alt"></i>
+                        <p>Pressure</p>
+                        <span id="pressure"></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-sun"></i>
+                        <p>UV Index</p>
+                        <span id="uv-index"></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-sunrise"></i>
+                        <p>Sunrise</p>
+                        <span id="sunrise"></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-sunset"></i>
+                        <p>Sunset</p>
+                        <span id="sunset"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
